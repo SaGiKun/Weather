@@ -1,5 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page import="org.json.simple.JSONObject" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -41,13 +43,7 @@
 	    </div>
 	</div>
 	
-	<form action="dataSearch.do" method="post" style="text-align:center; padding-top: 10px;">
-		<label>지명으로 관광지 찾기: </label>
-		<input type="text" name="search" />
-		<input type="submit" value="dataSearch">
-	</form>
-	
-    <script>
+	<script>
         var images = document.querySelectorAll('.image-container img');
         var currentIndex = 0;
         var maxVisibleImages = images.length;
@@ -103,5 +99,39 @@
             showNextImage();
         };
     </script>
+    
+	<%
+		String currentURL = request.getRequestURL().toString();
+		session.setAttribute("currentURL", currentURL);
+	%>
+	
+	<form action="dataSearch.do" method="post" style="text-align:center; padding-top: 10px;">
+		<label>지명으로 관광지 찾기: </label>
+		<input type="text" name="search" />
+		<input type="submit" value="dataSearch">
+	</form>
+	
+	<%
+	String searchValue = (String)request.getAttribute("searchValue");    
+    if(searchValue != null){
+    	out.println("<h3>검색어: " + searchValue + "</h3>");
+
+    	JSONArray searchResults = (JSONArray) request.getAttribute("searchResults");
+    	if (searchResults != null && !searchResults.isEmpty()) {
+    		for (Object result : searchResults) {
+    			if (result instanceof JSONObject) {
+    				JSONObject jsonObj = (JSONObject) result;
+    				out.println("<ul>");
+    				for (Object key : jsonObj.keySet()) {
+    					out.println("<li><b>" + key + ":</b> " + jsonObj.get(key) + "</li>");
+    				}
+    				out.println("</ul>");
+    			}
+    		}
+    	} else {
+    		out.println("<p>검색 결과가 없습니다.</p>");
+    	}	
+    }
+    %>
 </body>
 </html>

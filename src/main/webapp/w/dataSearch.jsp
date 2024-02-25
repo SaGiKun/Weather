@@ -15,32 +15,40 @@
 </head>
 <jsp:include page="/w/menu.jsp" />
 <body>
-<h2>°á°ú</h2>
     <%
     String searchValue = request.getParameter("search");
-    out.println("<h2>Selected value: " + searchValue + "</h2>");
+    String currentURL = (String) session.getAttribute("currentURL");
     
 	String jsonFilePath = getServletContext().getRealPath("/w/data.json");
 
 	JSONParser parser = new JSONParser();
 	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFilePath),"utf-8"));
 	JSONArray jsonArray = (JSONArray)parser.parse(br);
-
-	out.println("<h1>JSON ³»¿ë</h1>");
-	out.println("<ul>");
-
-	for (Object obj : jsonArray) {
-	    if (obj instanceof JSONObject) {
-	        JSONObject jsonObj = (JSONObject) obj;
-			if (jsonObj.get("°ü±¤Áö¸í") != null && (jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains("(" + searchValue.toLowerCase() + ")")) || jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains(searchValue.toLowerCase())) {
-				for (Object key : jsonObj.keySet()) {
-					out.println("<li><b>" + key + ":</b> " + jsonObj.get(key) + "</li>");
+	JSONArray searchResults = new JSONArray();
+	
+	if(searchValue != null){
+		for (Object obj : jsonArray) {
+		    if (obj instanceof JSONObject) {
+		        JSONObject jsonObj = (JSONObject)obj;
+				if (jsonObj.get("°ü±¤Áö¸í") != null && (jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains("(" + searchValue.toLowerCase() + ")")) || jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains(searchValue.toLowerCase())) {
+					for (Object key : jsonObj.keySet()) {
+						searchResults.add(jsonObj);
+					}
 				}
-				out.println("<br>");
 			}
 		}
+		request.setAttribute("searchResults", searchResults);
+		request.setAttribute("searchValue", searchValue);
+		
+		String referringPage = request.getHeader("Referer");
+	    if (referringPage != null && referringPage.contains("form.do")) {
+	        request.getRequestDispatcher("/w/form.jsp").forward(request, response);
+	    } else if (referringPage != null && referringPage.contains("nameSearch.do")) {
+	    	request.getRequestDispatcher("/w/nameSearch.jsp").forward(request, response);
+	    } else {
+	    	out.println("<p>referringPageToken: " + referringPage + "</p>");
+	    }
 	}
-	out.println("</ul>");
 %>
 </body>
 </html>
