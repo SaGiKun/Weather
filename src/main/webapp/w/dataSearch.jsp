@@ -7,6 +7,10 @@
 <%@ page import="org.json.simple.JSONArray" %>
 <%@ page import="org.json.simple.JSONObject" %>
 <%@ page import="org.json.simple.parser.JSONParser" %>
+<%@ page import="java.util.Set" %>
+<%@ page import="java.util.HashSet" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -24,7 +28,8 @@
 	JSONParser parser = new JSONParser();
 	BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(jsonFilePath),"utf-8"));
 	JSONArray jsonArray = (JSONArray)parser.parse(br);
-	JSONArray searchResults = new JSONArray();
+	Set<JSONObject> uniqueNames = new HashSet<JSONObject>();
+	List<JSONObject> searchResults = new ArrayList<>();
 	
 	if(searchValue != null){
 		for (Object obj : jsonArray) {
@@ -32,11 +37,13 @@
 		        JSONObject jsonObj = (JSONObject)obj;
 				if (jsonObj.get("°ü±¤Áö¸í") != null && (jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains("(" + searchValue.toLowerCase() + ")")) || jsonObj.get("°ü±¤Áö¸í").toString().toLowerCase().contains(searchValue.toLowerCase())) {
 					for (Object key : jsonObj.keySet()) {
-						searchResults.add(jsonObj);
+						uniqueNames.add(jsonObj);
 					}
 				}
 			}
+		    searchResults = new ArrayList<>(uniqueNames);
 		}
+		
 		request.setAttribute("searchResults", searchResults);
 		request.setAttribute("searchValue", searchValue);
 		

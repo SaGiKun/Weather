@@ -2,6 +2,8 @@
     pageEncoding="UTF-8"%>
 <%@ page import="org.json.simple.JSONArray" %>
 <%@ page import="org.json.simple.JSONObject" %>
+<%@ page import="java.util.List" %>
+<%@ page import="java.util.ArrayList" %>
 <!DOCTYPE html>
 <html>
 <head>
@@ -112,25 +114,26 @@
 	</form>
 	
 	<%
-	String searchValue = (String)request.getAttribute("searchValue");    
-    if(searchValue != null){
-    	out.println("<h3>검색어: " + searchValue + "</h3>");
+	String searchValue = (String)request.getAttribute("searchValue");
+	if(searchValue == null){
+		searchValue = "";
+	}
+    out.println("<h3>검색어: " + searchValue + "</h3>");
 
-    	JSONArray searchResults = (JSONArray) request.getAttribute("searchResults");
-    	if (searchResults != null && !searchResults.isEmpty()) {
-    		for (Object result : searchResults) {
-    			if (result instanceof JSONObject) {
-    				JSONObject jsonObj = (JSONObject) result;
-    				out.println("<ul>");
-    				for (Object key : jsonObj.keySet()) {
-    					out.println("<li><b>" + key + ":</b> " + jsonObj.get(key) + "</li>");
-    				}
-    				out.println("</ul>");
+    List<JSONObject> searchResults = (ArrayList)request.getAttribute("searchResults");
+    if (searchResults != null && !searchResults.isEmpty()) {
+    	for (Object result : searchResults) {
+    		if (result instanceof JSONObject) {
+    			JSONObject jsonObj = (JSONObject) result;
+    			out.println("<ul>");
+    			for (Object key : jsonObj.keySet()) {
+    				out.println("<li><b>" + key + ":</b> " + jsonObj.get(key) + "</li>");
     			}
+    			out.println("</ul>");
     		}
-    	} else {
-    		out.println("<p>검색 결과가 없습니다.</p>");
-    	}	
+    	}
+    } else {
+    	out.println("<p>검색 결과가 없습니다.</p>");
     }
     %>
 </body>
