@@ -4,6 +4,9 @@
 <%@ page import="java.text.SimpleDateFormat" %>
 <%@ page import="java.io.BufferedReader" %>
 <%@ page import="java.io.InputStreamReader" %>
+<%@ page import="org.json.simple.parser.JSONParser" %>
+<%@ page import="org.json.simple.JSONArray" %>
+<%@ page import="org.json.simple.JSONObject" %>
 <%@ page import="java.net.HttpURLConnection" %>
 <%@ page import="java.net.URL" %>
 <!DOCTYPE html>
@@ -15,14 +18,15 @@
 <jsp:include page="/w/menu.jsp"/>
 <body>
 <%
-        String region = request.getParameter("region");
-        String subRegion = request.getParameter("subRegion");
-        String id = "0";
-    if(region.equals("서울")){
-    	if(subRegion.equals("강남")){
-    		id = "1168000000";
-    	}
-    	if(subRegion.equals("종로")){
+	String region = request.getParameter("region");
+	String subRegion = request.getParameter("subRegion");
+	String id = "0";
+	Object regionStatus = "";
+	if(region.equals("서울")){
+		if(subRegion.equals("강남")){
+			id = "1168000000";
+		}
+		if(subRegion.equals("종로")){
     		id = "1111000000";
     	}
     }
@@ -51,9 +55,9 @@
     
     SimpleDateFormat timeFormat = new SimpleDateFormat("HHmm");
     String formattedTime = timeFormat.format(currentDate);
+    String jsonString = "";
     
     try {
-    	
     String apiURL = "https://apis.data.go.kr/1360000/TourStnInfoService1/getCityTourClmIdx1?";
     String serviceKey = "rMsytW9bKyJX/AhprdiNYd8H8fgTy1QGzav18/BRxINo4oIZc2iI5mhyVrBBt1lNzednRX9aUKC7b7SM0Gb76w==";
     String pageNo = "1";
@@ -71,30 +75,32 @@
     int responseCode = connection.getResponseCode();
     
     if (responseCode == HttpURLConnection.HTTP_OK) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(connection.getInputStream(), "UTF-8"));
-        StringBuilder responseBody = new StringBuilder();
-        String line;
-        
-        while ((line = reader.readLine()) != null) {
-            responseBody.append(line);
-        }
-        reader.close();
-        
-        out.println("<pre>" + responseBody.toString() + "</pre>");
+    	JSONParser parser = new JSONParser();
+    	BufferedReader br = new BufferedReader(new InputStreamReader(connection.getInputStream(),"utf-8"));
+    	JSONObject json = (JSONObject)parser.parse(br);
+    	
+    	jsonString = json.get("response").toString();
+    	
+    	out.print(jsonString);
+    	
+		
     } else {
         out.println("<h2>API 요청 실패. 응답 코드: " + responseCode + "</h2>");
-    }
+	}
     
-    connection.disconnect();
-} catch (Exception e) {
-    out.println("<h2>예외 발생: " + e.getMessage() + "</h2>");
-}
-
-    %>
+    	connection.disconnect();
+	} catch (Exception e) {
+    	out.println("<h2>예외 발생: " + e.getMessage() + "</h2>");
+	}
+%>
     <h2>현재 날짜: <%= formattedDate %></h2>
     <h2>현재 시간: <%= formattedTime %></h2>
     
     <h2>위치: <%= region %> <%= subRegion %></h2>
-    <h2>상태: </h2>
+    <h2>상태: <% if(jsonString.contains("매우 좋음")){%> 매우 좋음 <%} %>
+    <% if(jsonString.contains("좋음")){%> 좋음 <%} %>
+    <% if(jsonString.contains("보통")){%> 보통 <%} %>
+    <% if(jsonString.contains("나쁨")){%> 나쁨 <%} %>
+    </h2>
 </body>
 </html>

@@ -55,7 +55,7 @@
 		<nav>
 		<ul>
 			<li><a href="<%= request.getContextPath() %>/form.do">메인메뉴</a></li>
-			<li><a href="<%= request.getContextPath() %>/search.do">관광지 찾기</a></li>
+			<li><a href="<%= request.getContextPath() %>/weatherSearch.do">관광지 정보</a></li>
 		</ul>
 	</nav>
 	</div>
