@@ -48,7 +48,7 @@
 		request.setAttribute("searchValue", searchValue);
 		
 		String referringPage = request.getHeader("Referer");
-	    if (referringPage != null && referringPage.contains("form.do")) {
+	    if (referringPage != null && (referringPage.contains("form.do")|| (referringPage.contains("dataSearch.do")))) {
 	        request.getRequestDispatcher("/w/form.jsp").forward(request, response);
 	    } else if (referringPage != null && referringPage.contains("nameSearch.do")) {
 	    	request.getRequestDispatcher("/w/nameSearch.jsp").forward(request, response);

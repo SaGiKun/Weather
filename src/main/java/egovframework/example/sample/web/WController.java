@@ -40,4 +40,10 @@ public class WController {
 		
 		return "w/weather";
 	}
+	
+	@RequestMapping(value = "/map.do")
+	public String map() {
+		
+		return "w/map";
+	}
 }
