@@ -46,4 +46,16 @@ public class WController {
 		
 		return "w/map";
 	}
+	
+	@RequestMapping(value = "/main.do")
+	public String main() {
+		
+		return "w/main";
+	}
+	
+	@RequestMapping(value = "/testRedirectPage.do")
+	public String test1() {
+		
+		return "w/testRedirectPage";
+	}
 }
